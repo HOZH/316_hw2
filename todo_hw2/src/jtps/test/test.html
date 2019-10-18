@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+
+<head>
+    <title>@todo - The Todo List Manager</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="./../jtps.js"></script>
+    <script src="./Num.js"></script>
+    <script src="./AddToNum_Transaction.js"></script>
+    <script src="./AndMask_Transaction.js"></script>
+    <script src="./OrMask_Transaction.js"></script>
+    <!-- <script src = "./jsTPS_Tester.js"></script> -->
+    <!-- <script src = "./"></script> -->
+    <style>
+
+
+body{
+
+    background-color: aqua;
+    /* font-family: 'Courier New', Courier, monospace; */
+}
+        table,
+        th,
+        td {
+            border: 3px solid pink;
+            border-collapse: collapse;
+        }
+
+        #dynamic_tester {
+            position: fixed;
+            left: 550px;
+            width: 500px;
+        }
+
+        #dynamic_tester_menu {
+            position: fixed;
+            left: 900px;
+            width: 500px;
+        }
+
+        input {
+            position: absolute;
+            left: 50px;
+        }
+
+        span {
+            position: fixed;
+            left: 800px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="dynamic_tester">
+        <div id="current">CURRENT JSTPS:
+            <div>Number Of Transactions:
+                <span id="num_transactions">0</span>
+            </div>
+            <div>Current Index Of Transaction:
+                <span id="current_index">-1</span>
+            </div>
+            <div>Current Transaction Stack:
+                <div id="current_stack"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="dynamic_tester_menu">
+
+        <div>ENTER A SELECTION: </div>
+        <div>1) Add a Transaction</div>
+        <div>2) Undo a Transaction</div>
+        <div>3) Redo a Transaction</div>
+        <div>4) Clear All Transaction</div>
+        <div>5) Reset Num and Transactions</div>
+        <br>
+        <div>Section
+            <input id="section" type="input">
+        </div>
+        <br>
+        <div>value
+            <input id="value" type="input">
+        </div>
+        <br>
+        <input id="submit" type="button" value="submit" onclick="submit()">
+        <br>
+        <div>Number is:
+            <div id="total">0</div>
+        </div>
+
+
+    </div>
+
+    <table style="width:500px" id="table">
+        <tr>
+            <th>value 1</th>
+            <th>value 2</th>
+            <th>boolean</th>
+        </tr>
+    </table>
+
+</body>
+<script>
+    let createSection = (section_name) => {
+        let row = document.createElement("tr");
+        let head = document.createElement("th");
+        head.setAttribute("colspan", "3");
+        head.innerHTML = section_name;
+        row.appendChild(head)
+
+        return row;
+    }
+    let createRow = (value1, value2, value3) => {
+        let row = document.createElement("tr");
+        let c1 = document.createElement("td");
+        let c2 = document.createElement("td");
+        let c3 = document.createElement("td");
+        c1.innerHTML = value1;
+        c2.innerHTML = value2;
+        c3.innerHTML = value3;
+        row.appendChild(c1);
+        row.appendChild(c2);
+        row.appendChild(c3);
+        return row;
+    }
+    let createRow2 = (value1, value2) => {
+        let row = document.createElement("tr");
+        let c1 = document.createElement("td");
+        let c2 = document.createElement("td");
+        c1.setAttribute("colspan", "2");
+        c1.innerHTML = value1;
+        c2.innerHTML = value2;
+        row.appendChild(c1);
+        row.appendChild(c2);
+        return row;
+    }
+    let table = document.getElementById("table");
+
+    table.appendChild(createSection("CREATE NEW EMPTY JSTPS LIST"));
+    let tps = new jTPS();
+    let num = new Num();
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+
+    table.appendChild(createSection("ADD 5 TRANSACTION"));
+    tps.addTransaction(new AddToNum_Transaction(num, 5));
+    table.appendChild(createRow(5, "num.getNum()", num.getNum() == 5));
+    table.appendChild(createRow(1, "tps.getSize()", tps.getSize() == 1));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(1, "tps.getUndoSize()", tps.getUndoSize() == 1));
+
+    table.appendChild(createSection("ADD 10 TRANSACTION"));
+    tps.addTransaction(new AddToNum_Transaction(num, 10));
+    table.appendChild(createRow(15, "num.getNum()", num.getNum() == 15));
+    table.appendChild(createRow(2, "tps.getSize()", tps.getSize() == 2));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(2, "tps.getUndoSize()", tps.getUndoSize() == 2));
+
+    table.appendChild(createSection("ADD 20 TRANSACTION"));
+    tps.addTransaction(new AddToNum_Transaction(num, 20));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+
+    table.appendChild(createSection("TEST AND MASK"));
+    tps = new jTPS();
+    num = new Num();
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+
+    table.appendChild(createSection("ADD 4 TRANSACTION"));
+    tps.addTransaction(new AddToNum_Transaction(num, 12));
+    tps.addTransaction(new AndMask_Transaction(num, num.getNum(), 4))
+    table.appendChild(createRow(4, "num.getNum()", num.getNum() == 4));
+    table.appendChild(createRow(2, "tps.getSize()", tps.getSize() == 2));
+
+    table.appendChild(createSection("UNDO LAST TRANSACTION"));
+    tps.undoTransaction();
+    table.appendChild(createRow(12, "num.getNum()", num.getNum() == 12));
+    table.appendChild(createRow(2, "tps.getSize()", tps.getSize() == 2));
+    table.appendChild(createRow(1, "tps.getRedoSize()", tps.getRedoSize() == 1));
+    table.appendChild(createRow(1, "tps.getUndoSize()", tps.getUndoSize() == 1));
+
+    table.appendChild(createSection("TEST OR MASK"));
+    tps = new jTPS();
+    num = new Num();
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+
+    table.appendChild(createSection("ADD 4 TRANSACTION"));
+    tps.addTransaction(new AddToNum_Transaction(num, 12));
+    tps.addTransaction(new OrMask_Transaction(num, num.getNum(), 4))
+    table.appendChild(createRow(12, "num.getNum()", num.getNum() == 12));
+    table.appendChild(createRow(2, "tps.getSize()", tps.getSize() == 2));
+
+    table.appendChild(createSection("UNDO LAST TRANSACTION"));
+    tps.undoTransaction();
+    table.appendChild(createRow(12, "num.getNum()", num.getNum() == 12));
+    table.appendChild(createRow(2, "tps.getSize()", tps.getSize() == 2));
+    table.appendChild(createRow(1, "tps.getRedoSize()", tps.getRedoSize() == 1));
+    table.appendChild(createRow(1, "tps.getUndoSize()", tps.getUndoSize() == 1));
+
+    table.appendChild(createSection("TEST UNDO"));
+    tps = new jTPS();
+    num = new Num();
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == false));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+
+    table.appendChild(createSection("ADD 3 TRANSACTIONS (5, 10, 20)"));
+    tps.addTransaction(new AddToNum_Transaction(num, 5));
+    tps.addTransaction(new AddToNum_Transaction(num, 10));
+    tps.addTransaction(new AddToNum_Transaction(num, 20));
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("UNDO A TRANSACTION"));
+    tps.undoTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == true));
+    table.appendChild(createRow(15, "num.getNum()", num.getNum() == 15));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(1, "tps.getRedoSize()", tps.getRedoSize() == 1));
+    table.appendChild(createRow(2, "tps.getUndoSize()", tps.getUndoSize() == 2));
+
+    table.appendChild(createSection("UNDO ANOTHER"));
+    tps.undoTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == true));
+    table.appendChild(createRow(5, "num.getNum()", num.getNum() == 5));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(2, "tps.getRedoSize()", tps.getRedoSize() == 2));
+    table.appendChild(createRow(1, "tps.getUndoSize()", tps.getUndoSize() == 1));
+
+    table.appendChild(createSection("UNDO ANOTHER"));
+    tps.undoTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == false));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == true));
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(3, "tps.getRedoSize()", tps.getRedoSize() == 3));
+    table.appendChild(createRow(0, "tps.getUndoSize()", tps.getUndoSize() == 0));
+
+    table.appendChild(createSection("WE HAVE NO MORE TO UNDO SO THIS SHOULD DO NOTHING"));
+    tps.undoTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == false));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == true));
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(3, "tps.getRedoSize()", tps.getRedoSize() == 3));
+    table.appendChild(createRow(0, "tps.getUndoSize()", tps.getUndoSize() == 0));
+
+
+    table.appendChild(createSection("TEST REDO"));
+    tps = new jTPS();
+    num = new Num();
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == false));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+
+    table.appendChild(createSection("ADD 3 TRANSACTIONS (5, 10, 20)"));
+    tps.addTransaction(new AddToNum_Transaction(num, 5));
+    tps.addTransaction(new AddToNum_Transaction(num, 10));
+    tps.addTransaction(new AddToNum_Transaction(num, 20));
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("UNDO A TRANSACTION AND THEN REDO IT"));
+    tps.undoTransaction();
+    tps.doTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("UNDO TWO TRANSACTIONS AND THEN REDO THEM"));
+    tps.undoTransaction();
+    tps.undoTransaction();
+    tps.doTransaction();
+    tps.doTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("UNDO three TRANSACTIONS AND THEN REDO THEM"));
+    tps.undoTransaction();
+    tps.undoTransaction();
+    tps.undoTransaction();
+    tps.doTransaction();
+    tps.doTransaction();
+    tps.doTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("UNDO three TRANSACTIONS AND THEN REDO TWO"));
+    tps.undoTransaction();
+    tps.undoTransaction();
+    tps.undoTransaction();
+    tps.doTransaction();
+    tps.doTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == true));
+    table.appendChild(createRow(15, "num.getNum()", num.getNum() == 15));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(1, "tps.getRedoSize()", tps.getRedoSize() == 1));
+    table.appendChild(createRow(2, "tps.getUndoSize()", tps.getUndoSize() == 2));
+
+    table.appendChild(createSection("UNDO ALL THREE TRANSACTIONS AND REDO FOUR, WHICH SHOULD NOT PRODUCE AN ERROR BUT THE LAST REDO SHOULD DO NOTHING"));
+    tps.undoTransaction();
+    tps.undoTransaction();
+    tps.undoTransaction();
+    tps.doTransaction();
+    tps.doTransaction();
+    tps.doTransaction();
+    tps.doTransaction();
+    table.appendChild(createRow2("tps.hasTransactionToUndo()", tps.hasTransactionToUndo() == true));
+    table.appendChild(createRow2("tps.hasTransactionToRedo()", tps.hasTransactionToRedo() == false));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("TEST CLEAR"));
+    tps = new jTPS();
+    num = new Num();
+    table.appendChild(createRow(0, "num.getNum()", num.getNum() == 0));
+
+    table.appendChild(createSection("ADD 3 TRANSACTIONS (5, 10, 20)"));
+    tps.addTransaction(new AddToNum_Transaction(num, 5));
+    tps.addTransaction(new AddToNum_Transaction(num, 10));
+    tps.addTransaction(new AddToNum_Transaction(num, 20));
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("CLEAR ALL TRANSACTIONS"));
+    tps.clearAllTransactions();
+    table.appendChild(createRow(35, "num.getNum()", num.getNum() == 35));
+    table.appendChild(createRow(0, "tps.getSize()", tps.getSize() == 0));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(0, "tps.getUndoSize()", tps.getUndoSize() == 0));
+
+    table.appendChild(createSection("ADD 3 TRANSACTIONS (5, 10, 20)"));
+    tps.addTransaction(new AddToNum_Transaction(num, 5));
+    tps.addTransaction(new AddToNum_Transaction(num, 10));
+    tps.addTransaction(new AddToNum_Transaction(num, 20));
+    table.appendChild(createRow(70, "num.getNum()", num.getNum() == 70));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+
+    table.appendChild(createSection("CLEAR THEM ALL OUT AGAIN"));
+    tps.clearAllTransactions();
+    table.appendChild(createRow(70, "num.getNum()", num.getNum() == 70));
+    table.appendChild(createRow(0, "tps.getSize()", tps.getSize() == 0));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(0, "tps.getUndoSize()", tps.getUndoSize() == 0));
+
+    table.appendChild(createSection("ADD 3 TRANSACTIONS (5, 10, 20)"));
+    tps.addTransaction(new AddToNum_Transaction(num, 5));
+    tps.addTransaction(new AddToNum_Transaction(num, 10));
+    tps.addTransaction(new AddToNum_Transaction(num, 20));
+    table.appendChild(createRow(105, "num.getNum()", num.getNum() == 105));
+    table.appendChild(createRow(3, "tps.getSize()", tps.getSize() == 3));
+    table.appendChild(createRow(0, "tps.getRedoSize()", tps.getRedoSize() == 0));
+    table.appendChild(createRow(3, "tps.getUndoSize()", tps.getUndoSize() == 3));
+</script>
+<script>
+    window.tps = new jTPS();
+    window.num = new Num();
+    let submit = () => {
+        let section = document.getElementById("section").value;
+        let value = document.getElementById("value").value;
+        if (section == 1) {
+            window.tps.addTransaction(new AddToNum_Transaction(window.num, parseInt(value)));
+        }
+        else if (section == 2) {
+            window.tps.undoTransaction();
+        }
+        else if (section == 3) {
+            window.tps.doTransaction();
+        }
+        else if (section == 4) {
+            window.tps.clearAllTransactions();
+        }
+        else if (section == 5) {
+            window.tps.clearAllTransactions();
+            window.num.setNum(0);
+        }
+
+        document.getElementById("total").innerHTML = window.num.getNum();
+        let stack = document.getElementById("current_stack");
+        while (stack.childNodes.length > 0)
+            stack.removeChild(stack.firstChild);
+        for (let i = 0; i <= window.tps.mostRecentTransaction; i++) {
+            let line = document.createElement("div");
+            let jT = window.tps.transactions[i];
+            line.innerHTML = jT.toString();
+            stack.appendChild(line);
+        }
+        document.getElementById("num_transactions").innerHTML = window.tps.getSize();
+        document.getElementById("current_index").innerHTML = window.tps.mostRecentTransaction;
+    }
+</script>
+
+</html>
