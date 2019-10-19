@@ -56,9 +56,9 @@ class App_Transaction {
 
 
   doTransaction() {
-    console.log(this.futState.currentList,"current list")
+    // console.log(this.futState.currentList,"current list")
     this.currentApp.setState({ currentList: this.futState.currentList }, () => {
-      console.log(this.futState.currentList, "current list")
+      // console.log(this.futState.currentList, "current list")
 })
 
     this.currentApp.setState(this.futState)
@@ -105,7 +105,10 @@ class App extends Component {
     currentScreen: AppScreen.HOME_SCREEN,
     todoLists: testTodoListData.todoLists,
     currentList: null,
-    currentItemSortCriteria: ItemSortCriteria.SORT_BY_TASK_INCREASING,
+    // currentItemSortCriteria: ItemSortCriteria.SORT_BY_TASK_INCREASING,
+    // currentItemSortCriteria: ItemSortCriteria.SORT_BY_DUE_DATE_INCREASING,
+        currentItemSortCriteria: null,
+
     todoItem: null,
     name: null,
     owner: null,
@@ -178,8 +181,13 @@ class App extends Component {
 
     // var temp_newLists = JSON.parse(JSON.stringify(newLists))
     // this.setState({ todoLists: newLists })
-    console.log("new list", newLists);
+    // console.log("new list", newLists);
     temp__.todoLists = newLists
+
+    console.log('warp');
+    console.log(temp__.currentItemSortCriteria,sortingCriteria);
+    console.log('warp');
+
     this.jtps.addTransaction(new App_Transaction(this, temp_, temp__, 'sort'))
 
 
@@ -194,7 +202,7 @@ class App extends Component {
 
 
   isCurrentItemSortCriteria = (testCriteria) => {
-    // console.log(this.state.currentItemSortCriteria === testCriteria);
+    // console.log(this.state.currentItemSortCriteria,testCriteria,this.state.currentItemSortCriteria === testCriteria);
     return this.state.currentItemSortCriteria === testCriteria;
   }
   compare = (item1, item2) => {
@@ -267,7 +275,7 @@ class App extends Component {
     var temp_ = JSON.parse(JSON.stringify(this.state));
     var temp__ = JSON.parse(JSON.stringify(this.state));
 
-    console.log("type of change");
+    // console.log("type of change");
     var tempList = {
       key: uuid.v4(),
       name: 'Unknown',
@@ -357,13 +365,13 @@ class App extends Component {
     var temp___ = JSON.parse(JSON.stringify(this.state));
 
 
-    console.log(e)
+    // console.log(e)
 
     var index = this.state.currentList.items.findIndex(current => {
-      console.log(current, e)
+      // console.log(current, e)
       return current === e
     })
-    console.log(index);
+    // console.log(index);
 
     // var newList = this.state.currentList
     // var temp = newList.items[index - 1]
@@ -417,13 +425,13 @@ class App extends Component {
     var temp_ = JSON.parse(JSON.stringify(this.state));
     var temp__ = JSON.parse(JSON.stringify(this.state));
     var temp___ = JSON.parse(JSON.stringify(this.state));
-    console.log(e)
+    // console.log(e)
 
     var index = this.state.currentList.items.findIndex(current => {
-      console.log(current, e)
+      // console.log(current, e)
       return current === e
     })
-    console.log(index);
+    // console.log(index);
 
     var newList = temp___.currentList
     var temp = newList.items[index + 1]
@@ -499,7 +507,7 @@ class App extends Component {
 
   deleteItem = (e) => {
 
-    console.log(e)
+    // console.log(e)
 
 
     var temp_ = JSON.parse(JSON.stringify(this.state));
@@ -509,13 +517,13 @@ class App extends Component {
 
 
     var newList = temp____.currentList
-    console.log("new",newList);
+    // console.log("new",newList);
     // this.state.currentList
 
     newList.items = [...newList.items.filter(todo => (todo.assigned_to!==e.assigned_to ||todo.due_date!==e.due_date||todo.description!==e.description||todo.completed!==e.completed||todo.key!==e.key))
     
     ]
-    console.log(newList);
+    // console.log(newList);
 
     const newLists = [...temp___.todoLists.map(current => {
       // console.log(current, temp____.currentList, current===temp____.currentList);
@@ -557,8 +565,8 @@ class App extends Component {
 
   updateItem = (value) => {
 
-    console.log("updateItemajsdfkjdaskflj");
-    console.log(value);
+    // console.log("updateItemajsdfkjdaskflj");
+    // console.log(value);
 
 
     var temp_ = JSON.parse(JSON.stringify(this.state));
